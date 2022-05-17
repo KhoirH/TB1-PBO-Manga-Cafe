@@ -23,12 +23,24 @@ import javax.swing.JPopupMenu;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+
 import java.awt.CardLayout;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormSpecs;
 import com.jgoodies.forms.layout.RowSpec;
+import com.mercubuana.app05.Kamar;
+
 
 public class Tb1PboMangaCafeView {
 
@@ -37,6 +49,10 @@ public class Tb1PboMangaCafeView {
 	private JList list;
 	private JTextField textField;
 	private JTextField textField_1;
+	
+	
+	private ArrayList<RuangCafe> daftarRuang = new ArrayList<RuangCafe>();
+	
 
 	/**
 	 * Launch the application.
@@ -274,5 +290,35 @@ public class Tb1PboMangaCafeView {
 				popup.show(e.getComponent(), e.getX(), e.getY());
 			}
 		});
+	}
+	
+	private void recordRuangCafe() {
+		try {
+			String fileName = "data_ruang.txt";
+			FileOutputStream fos = new FileOutputStream(fileName);
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(daftarRuang);
+			oos.close();
+		} catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(null, "File tidak bisa ditemukan.\nPesan kesalahan: " + e.getMessage());
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(null, "Terjadi error pada saat merekam data ke storage.\n Pesan kesalahan: " + e.getMessage());
+		}
+	}
+	
+	protected void readRuangCafe() {
+		try {
+			String fileName = "data_ruang.txt";
+			FileInputStream fis = new FileInputStream(fileName);
+			ObjectInputStream ois = new ObjectInputStream(fis);
+			daftarRuang = (ArrayList<RuangCafe>) ois.readObject();
+			ois.close();
+		} catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(null, "File tidak bisa ditemukan.\nPesan kesalahan: " + e.getMessage());
+		} catch (ClassNotFoundException e) {
+//			JOptionPane.showMessageDialog(null, "Class tidak bisa ditemukan.\nPesan kesalahan: " + e.getMessage());
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(null, "Terjadi error pada saat merekam data ke storage.\n Pesan kesalahan: " + e.getMessage());
+		}
 	}
 }
