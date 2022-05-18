@@ -1,45 +1,44 @@
 package com.mercubuana.Tb1PboMangaCafeView;
 
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import java.awt.Font;
-import javax.swing.JTabbedPane;
+import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.SystemColor;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JList;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JTextField;
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JPopupMenu;
 import java.awt.Component;
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.SystemColor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.FileNotFoundException;	
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
+import javax.swing.DefaultListModel;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.LayoutStyle.ComponentPlacement;
 
-import java.awt.CardLayout;
-import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.FormSpecs;
 import com.jgoodies.forms.layout.RowSpec;
-import com.mercubuana.app05.Kamar;
 
 
 public class Tb1PboMangaCafeView {
@@ -52,7 +51,11 @@ public class Tb1PboMangaCafeView {
 	
 	
 	private ArrayList<RuangCafe> daftarRuang = new ArrayList<RuangCafe>();
-	
+	//headers for the table
+    String[] columns = new String[] {
+        "No", "Ruang", "Jenis", "Sisa Ruang"
+    };
+     
 
 	/**
 	 * Launch the application.
@@ -74,6 +77,7 @@ public class Tb1PboMangaCafeView {
 	 * Create the application.
 	 */
 	public Tb1PboMangaCafeView() {
+		readRuangCafe();
 		initialize();
 	}
 
@@ -81,6 +85,7 @@ public class Tb1PboMangaCafeView {
 	 * Initialize the contents of the frame.
 	 */
 	
+	@SuppressWarnings("unchecked")
 	private void initialize() {
 		frmMangaCafe = new JFrame();
 		frmMangaCafe.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -88,13 +93,8 @@ public class Tb1PboMangaCafeView {
 		frmMangaCafe.setBounds(100, 100, 657, 598);
 		frmMangaCafe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		//headers for the table
-        String[] columns = new String[] {
-            "No", "Ruang", "Jenis", "Sisa Ruang"
-        };
-         
         //actual data for the table in a 2d array
-        Object[][] data = new Object[][] {
+        Object[][] dataTable = new Object[][] {
             {1, "R-01", "Reguler", 0 },
             {2, "R-01", "VIP", 0 },
             {3, "R-01", "Extended", 0},
@@ -267,10 +267,11 @@ public class Tb1PboMangaCafeView {
 		JScrollPane scrollPane = new JScrollPane();
 		tabbedPane.addTab("Ketersedian Ruangan", null, scrollPane, null);
 		
-		table = new JTable(data, columns);
+		table = new JTable(dataTable, columns);
 		scrollPane.setViewportView(table);
-		
-		list = new JList();
+		DefaultListModel<String> demoList = new DefaultListModel<String>();
+		 demoList.addElement("addElements");
+		list = new JList<String>(demoList);
 		tabbedPane.addTab("Ruangan Tersewa", null, list, null);
 		frmMangaCafe.getContentPane().setLayout(groupLayout);
 	}
@@ -306,6 +307,7 @@ public class Tb1PboMangaCafeView {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected void readRuangCafe() {
 		try {
 			String fileName = "data_ruang.txt";
