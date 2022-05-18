@@ -22,6 +22,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -270,7 +271,17 @@ public class Tb1PboMangaCafeView {
 		table = new JTable(dataTable, columns);
 		scrollPane.setViewportView(table);
 		DefaultListModel<String> demoList = new DefaultListModel<String>();
-		 demoList.addElement("addElements");
+		
+		
+		// view list
+		for (RuangCafe rc : daftarRuang) {
+			String jenisRuang = rc.getJenisRuang();
+			String namaRuang= rc.getNamaRuang();
+			int jumlahSlotSewaHarian= rc.getJumlahSlotSewaHarian();
+			
+			demoList.addElement("addElements");
+		}
+		
 		list = new JList<String>(demoList);
 		tabbedPane.addTab("Ruangan Tersewa", null, list, null);
 		frmMangaCafe.getContentPane().setLayout(groupLayout);
@@ -307,6 +318,37 @@ public class Tb1PboMangaCafeView {
 		}
 	}
 	
+	public void dropdownComponent(String[] args) {
+        String[] optionsToChoose = {"Apple", "Orange", "Banana", "Pineapple", "None of the listed"};
+
+        JFrame jFrame = new JFrame();
+
+        JComboBox<String> jComboBox = new JComboBox<>(optionsToChoose);
+        jComboBox.setBounds(80, 50, 140, 20);
+
+        JButton jButton = new JButton("Done");
+        jButton.setBounds(100, 100, 90, 20);
+
+        JLabel jLabel = new JLabel();
+        jLabel.setBounds(90, 100, 400, 100);
+
+        jFrame.add(jButton);
+        jFrame.add(jComboBox);
+        jFrame.add(jLabel);
+        
+        jFrame.setLayout(null);
+        jFrame.setSize(350, 250);
+        jFrame.setVisible(true);
+
+        jButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String selectedFruit = "You selected " + jComboBox.getItemAt(jComboBox.getSelectedIndex());
+                jLabel.setText(selectedFruit);
+            }
+        });
+
+    }
 	@SuppressWarnings("unchecked")
 	protected void readRuangCafe() {
 		try {
