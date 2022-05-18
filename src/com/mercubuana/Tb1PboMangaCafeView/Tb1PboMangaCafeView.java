@@ -87,7 +87,6 @@ public class Tb1PboMangaCafeView {
 	 * Create the application.
 	 */
 	public Tb1PboMangaCafeView() {
-		readRuangCafe();
 		initialize();
 	}
 
@@ -102,8 +101,6 @@ public class Tb1PboMangaCafeView {
 		frmMangaCafe.setTitle("Manga cafe");
 		frmMangaCafe.setBounds(100, 100, 657, 598);
 		frmMangaCafe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		list = new JList();
 		panelNamaPembooking = new JPanel();
 		panelRuangan = new JPanel();
 		panelJenisRuangan = new JPanel();
@@ -119,24 +116,6 @@ public class Tb1PboMangaCafeView {
 		btnEdit = new JButton("Edit");
 		btnPesan = new JButton("Pesan");
 		txtNamaPembooking = new JTextField();
-		
-		//headers for the table
-        String[] columns = new String[] {
-            "No", "Ruang", "Jenis", "Sisa Ruang"
-        };
-         
-        //actual data for the table in a 2d array
-        Object[][] data = new Object[][] {
-            { 1, "R-01", "Reguler", 20 },
-            { 2, "R-01", "VIP", 20 },
-            { 3, "R-01", "Extended", 20 },
-            { 4, "V-01", "Reguler", 20 },
-            { 5, "V-01", "VIP", 20 },
-            { 6, "V-01", "Extended", 20 },
-            { 7, "X-01", "Reguler", 20 },
-            { 8, "X-01", "VIP", 20 },
-            { 9, "X-01", "Extended", 20 },
-        };
 		
 		
 		tabbedPane.setFont(new Font("Dialog", Font.PLAIN, 14));
@@ -249,30 +228,13 @@ public class Tb1PboMangaCafeView {
 				RowSpec.decode("28px"),}));
 		panelNamaPembooking.add(lblNamaPembooking, "2, 2, left, center");
 		panelNamaPembooking.add(txtNamaPembooking, "4, 2, default, center");
-		
-		tabbedPane.addTab("Ruangan Tersewa", null, list, null);
-		
-		JScrollPane scrollPane = new JScrollPane();
-		tabbedPane.addTab("Ketersedian Ruangan", null, scrollPane, null);
-		
-		table = new JTable(dataTable, columns);
-		scrollPane.setViewportView(table);
-		DefaultListModel<String> demoList = new DefaultListModel<String>();
+
+			 
+		readRuangCafe();
+		getDataRuangan();
 		
 		
-		// view list
-		for (RuangCafe rc : daftarRuang) {
-			String jenisRuang = rc.getJenisRuang();
-			String namaRuang= rc.getNamaRuang();
-			int jumlahSlotSewaHarian= rc.getJumlahSlotSewaHarian();
-			
-			demoList.addElement("addElements");
-		}
-		
-		list = new JList<String>(demoList);
-		tabbedPane.addTab("Ruangan Tersewa", null, list, null);
 		frmMangaCafe.getContentPane().setLayout(groupLayout);
-		
 		
 		btnTambah.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -292,11 +254,11 @@ public class Tb1PboMangaCafeView {
 
 		btnPesan.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				readRuangCafe();
 				sewaRuangan();
 			}
 		});
 		
-		readRuangCafe();
 	}
 	
 	private static void addPopup(Component component, final JPopupMenu popup) {
@@ -315,6 +277,93 @@ public class Tb1PboMangaCafeView {
 				popup.show(e.getComponent(), e.getX(), e.getY());
 			}
 		});
+	}
+	
+	protected void getDataRuangan() {
+		tabbedPane.removeAll();
+		//headers for the table
+        String[] columns = new String[] {
+            "No", "Ruang", "Jenis", "Sisa Ruang"
+        };
+         
+        int slotRuang = 10;
+        int totalR1VIP = 0;
+        int totalR1Extended = 0;
+        int totalR1Reguler = 0;
+        int totalV1VIP = 0;
+        int totalV1Extended = 0;
+        int totalV1Reguler = 0;
+        int totalX1VIP = 0;
+        int totalX1Extended = 0;
+        int totalX1Reguler = 0;
+    	
+		DefaultListModel<String> demoList = new DefaultListModel<String>();	
+
+		// loop data booking place
+		for (RuangCafe rt : ruanganTersewa) {
+			
+			
+			
+			String jenisRuang = rt.getJenisRuangan();
+			String namaRuang= rt.getNamaRuangan();
+			int jumlahSlotSewaHarian = rt.getJumlahSlotSewaHarian();
+			String stringJumlahSlotSewaHarian= "" + rt.getJumlahSlotSewaHarian();
+			String namaPembooking= rt.getNamaPembooking();
+			
+
+			if ( namaRuang.equals("R-01") && jenisRuang.equals("Reguler")) {
+				totalR1Reguler += jumlahSlotSewaHarian;
+			}
+			if ( namaRuang.equals("R-01") && jenisRuang.equals("VIP")) {
+				totalR1VIP += jumlahSlotSewaHarian;
+			}
+			if ( namaRuang.equals("R-01") && jenisRuang.equals("Extended")) {
+				totalR1Extended += jumlahSlotSewaHarian;
+			}
+			if ( namaRuang.equals("V-01") && jenisRuang.equals("Reguler")) {
+				totalV1Reguler += jumlahSlotSewaHarian;
+			}
+			if ( namaRuang.equals("V-01") && jenisRuang.equals("VIP")) {
+				totalV1VIP += jumlahSlotSewaHarian;
+			}
+			if ( namaRuang.equals("V-01") && jenisRuang.equals("Extended")) {
+				totalV1Extended += jumlahSlotSewaHarian;
+			}
+			if ( namaRuang.equals("X-01") && jenisRuang.equals("Reguler")) {
+				totalX1Reguler += jumlahSlotSewaHarian;
+			}
+			if ( namaRuang.equals("X-01") && jenisRuang.equals("VIP")) {
+				totalX1VIP += jumlahSlotSewaHarian;
+			}
+			if ( namaRuang.equals("X-01") && jenisRuang.equals("Extended")) {
+				totalX1Extended += jumlahSlotSewaHarian;
+			}
+			// list booking place
+			String listString = namaPembooking + " " + namaRuang + "-" + jenisRuang + "(" + stringJumlahSlotSewaHarian + ")" ;
+			demoList.addElement(listString);
+		}
+		
+        //actual data for the table in a 2d array
+        Object[][] dataTable = new Object[][] {
+            { 1, "R-01", "Reguler", slotRuang - totalR1Reguler },
+            { 2, "R-01", "VIP", slotRuang - totalR1VIP },
+            { 3, "R-01", "Extended", slotRuang - totalR1Extended },
+            { 4, "V-01", "Reguler", slotRuang - totalV1Reguler },
+            { 5, "V-01", "VIP", slotRuang - totalV1VIP },
+            { 6, "V-01", "Extended", slotRuang - totalV1Extended },
+            { 7, "X-01", "Reguler", slotRuang - totalX1Reguler },
+            { 8, "X-01", "VIP", slotRuang - totalX1VIP },
+            { 9, "X-01", "Extended", slotRuang - totalX1Extended },
+        };
+	
+		list = new JList<String>(demoList);
+		
+
+		tabbedPane.addTab("Ruangan Tersewa", null, list, null);	
+		JScrollPane scrollPane = new JScrollPane();
+		tabbedPane.addTab("Ketersedian Ruangan", null, scrollPane, null);
+		table = new JTable(dataTable, columns);
+		scrollPane.setViewportView(table);	
 	}
 	
 	protected void sewaRuangan() {
@@ -352,6 +401,7 @@ public class Tb1PboMangaCafeView {
 		RuangCafe ruangCafe = new RuangCafe(namaPembooking, namaRuangan, jenisRuangan, jumlahSlot, 20);
 		ruanganTersewa.add(ruangCafe);
 		recordRuangCafe();
+		getDataRuangan();
 	}
 	
 	private void recordRuangCafe() {
@@ -383,11 +433,11 @@ public class Tb1PboMangaCafeView {
         JLabel jLabel = new JLabel();
         jLabel.setBounds(90, 100, 400, 100);
 
-        jFrame.add(jButton);
-        jFrame.add(jComboBox);
-        jFrame.add(jLabel);
+        jFrame.getContentPane().add(jButton);
+        jFrame.getContentPane().add(jComboBox);
+        jFrame.getContentPane().add(jLabel);
         
-        jFrame.setLayout(null);
+        jFrame.getContentPane().setLayout(null);
         jFrame.setSize(350, 250);
         jFrame.setVisible(true);
 
