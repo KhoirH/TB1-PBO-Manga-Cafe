@@ -176,7 +176,7 @@ public class Tb1PboMangaCafeView {
 				FormSpecs.LINE_GAP_ROWSPEC,
 				RowSpec.decode("28px"),}));
 		
-		JLabel lblJumlahSlot = new JLabel("Jumlah Slot ");
+		JLabel lblJumlahSlot = new JLabel("Jumlah Ruangan");
 		lblJumlahSlot.setFont(new Font("SansSerif", Font.PLAIN, 14));
 		panel_4.add(lblJumlahSlot, "2, 2, left, center");
 		
