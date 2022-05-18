@@ -39,23 +39,32 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.FormSpecs;
 import com.jgoodies.forms.layout.RowSpec;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
 
 
 public class Tb1PboMangaCafeView {
 
 	private JFrame frmMangaCafe;
 	private JTable table;
+	private JTabbedPane tabbedPane;
 	private JList list;
-	private JTextField textField;
-	private JTextField textField_1;
+	private JPanel panelNamaPembooking;
+	private JPanel panelRuangan;
+	private JPanel panelJenisRuangan;
+	private JPanel panelJumlahSlot;
+	private JButton btnTambah;
+	private JButton btnHapus;
+	private JButton btnEdit;
+	private JButton btnPesan;
 	
+	private JTextField txtNamaPembooking;
+	private JTextField txtJumlahSlot;
+	private JComboBox cmbRuangan;
+	private JComboBox cmbTipeRuangan;
 	
-	private ArrayList<RuangCafe> daftarRuang = new ArrayList<RuangCafe>();
-	//headers for the table
-    String[] columns = new String[] {
-        "No", "Ruang", "Jenis", "Sisa Ruang"
-    };
-     
+	private ArrayList<RuangCafe> ruanganTersewa = new ArrayList<RuangCafe>();
+	
 
 	/**
 	 * Launch the application.
@@ -93,53 +102,49 @@ public class Tb1PboMangaCafeView {
 		frmMangaCafe.setBounds(100, 100, 657, 598);
 		frmMangaCafe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
+		list = new JList();
+		panelNamaPembooking = new JPanel();
+		panelRuangan = new JPanel();
+		panelJenisRuangan = new JPanel();
+		panelJumlahSlot = new JPanel();
+		
+		
+		txtJumlahSlot = new JTextField();
+		cmbTipeRuangan = new JComboBox();
+		cmbRuangan = new JComboBox();
+		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		btnTambah = new JButton("Tambah");
+		btnHapus = new JButton("Hapus");
+		btnEdit = new JButton("Edit");
+		btnPesan = new JButton("Pesan");
+		txtNamaPembooking = new JTextField();
+		
+		//headers for the table
+        String[] columns = new String[] {
+            "No", "Ruang", "Jenis", "Sisa Ruang"
+        };
+         
         //actual data for the table in a 2d array
-        Object[][] dataTable = new Object[][] {
-            {1, "R-01", "Reguler", 0 },
-            {2, "R-01", "VIP", 0 },
-            {3, "R-01", "Extended", 0},
-            {4, "V-01", "Reguler", 0 },
-            {5, "V-01", "VIP", 0 },
-            {6, "V-01", "Extended", 0},
-            {4, "X-01", "Reguler", 0 },
-            {5, "X-01", "VIP", 0 },
-            {6, "X-01", "Extended", 0},
+        Object[][] data = new Object[][] {
+            { 1, "R-01", "Reguler", 20 },
+            { 2, "R-01", "VIP", 20 },
+            { 3, "R-01", "Extended", 20 },
+            { 4, "V-01", "Reguler", 20 },
+            { 5, "V-01", "VIP", 20 },
+            { 6, "V-01", "Extended", 20 },
+            { 7, "X-01", "Reguler", 20 },
+            { 8, "X-01", "VIP", 20 },
+            { 9, "X-01", "Extended", 20 },
         };
 		
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		
 		tabbedPane.setFont(new Font("Dialog", Font.PLAIN, 14));
 		tabbedPane.setFocusable(false);
 		tabbedPane.setFocusTraversalKeysEnabled(false);
 		tabbedPane.setBackground(SystemColor.inactiveCaption);
 		tabbedPane.setForeground(Color.BLACK);
 		
-		JButton btnNewButton = new JButton("Tambah");
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-			}
-		});
 		
-		JButton btnHapus = new JButton("Hapus");
-		btnHapus.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JButton btnEdit = new JButton("Edit");
-		btnEdit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		
-		JPanel panel_1 = new JPanel();
-		
-		JPanel panel_2 = new JPanel();
-		
-		JPanel panel_3 = new JPanel();
-		
-		JPanel panel_4 = new JPanel();
-		
-		JButton btnPesan = new JButton("Pesan");
 		GroupLayout groupLayout = new GroupLayout(frmMangaCafe.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -149,17 +154,17 @@ public class Tb1PboMangaCafeView {
 						.addComponent(btnPesan, GroupLayout.PREFERRED_SIZE, 228, GroupLayout.PREFERRED_SIZE)
 						.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 604, GroupLayout.PREFERRED_SIZE)
 						.addGroup(groupLayout.createSequentialGroup()
-							.addComponent(btnNewButton, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)
+							.addComponent(btnTambah, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnEdit, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE)
 							.addPreferredGap(ComponentPlacement.RELATED)
 							.addComponent(btnHapus, GroupLayout.PREFERRED_SIZE, 118, GroupLayout.PREFERRED_SIZE))
 						.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
-							.addComponent(panel_3, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addComponent(panel_2, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addComponent(panel_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-						.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(29, Short.MAX_VALUE))
+							.addComponent(panelJenisRuangan, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(panelRuangan, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+							.addComponent(panelNamaPembooking, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+						.addComponent(panelJumlahSlot, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(39, Short.MAX_VALUE))
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -168,22 +173,22 @@ public class Tb1PboMangaCafeView {
 					.addComponent(tabbedPane, GroupLayout.PREFERRED_SIZE, 215, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btnNewButton, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnTambah, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)
 						.addComponent(btnEdit, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)
 						.addComponent(btnHapus, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE))
 					.addGap(36)
-					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addComponent(panelNamaPembooking, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addComponent(panelRuangan, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addComponent(panelJenisRuangan, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addGap(18)
-					.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addComponent(panelJumlahSlot, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addGap(18)
 					.addComponent(btnPesan, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(16, Short.MAX_VALUE))
+					.addContainerGap(26, Short.MAX_VALUE))
 		);
-		panel_4.setLayout(new FormLayout(new ColumnSpec[] {
+		panelJumlahSlot.setLayout(new FormLayout(new ColumnSpec[] {
 				FormSpecs.LABEL_COMPONENT_GAP_COLSPEC,
 				ColumnSpec.decode("127px"),
 				FormSpecs.LABEL_COMPONENT_GAP_COLSPEC,
@@ -194,66 +199,46 @@ public class Tb1PboMangaCafeView {
 		
 		JLabel lblJumlahSlot = new JLabel("Jumlah Ruangan");
 		lblJumlahSlot.setFont(new Font("SansSerif", Font.PLAIN, 14));
-		panel_4.add(lblJumlahSlot, "2, 2, left, center");
-		
-		textField_1 = new JTextField();
-		panel_4.add(textField_1, "4, 2");
-		textField_1.setColumns(10);
-		
-		JPanel panel_5 = new JPanel();
-		panel_5.setLayout(new CardLayout(0, 0));
-		
-		JButton btnVip = new JButton("VIP");
-		btnVip.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-			}
-		});
-		panel_3.setLayout(new FormLayout(new ColumnSpec[] {
+		panelJumlahSlot.add(lblJumlahSlot, "2, 2, left, center");
+		panelJumlahSlot.add(txtJumlahSlot, "4, 2");
+		txtJumlahSlot.setColumns(10);
+		panelJenisRuangan.setLayout(new FormLayout(new ColumnSpec[] {
 				FormSpecs.RELATED_GAP_COLSPEC,
 				ColumnSpec.decode("124px"),
 				FormSpecs.LABEL_COMPONENT_GAP_COLSPEC,
-				ColumnSpec.decode("269px"),},
+				ColumnSpec.decode("269px:grow"),},
 			new RowSpec[] {
 				FormSpecs.RELATED_GAP_ROWSPEC,
 				RowSpec.decode("28px"),}));
 		
 		JLabel lblJenisRuangan = new JLabel("Jenis Ruangan");
 		lblJenisRuangan.setFont(new Font("SansSerif", Font.PLAIN, 14));
-		panel_3.add(lblJenisRuangan, "2, 2, left, fill");
-		panel_5.add(btnVip, "name_237298207859400");
+		panelJenisRuangan.add(lblJenisRuangan, "2, 2, right, fill");
 		
-		JMenuItem menuItem = new JMenuItem("New menu item");
-		panel_5.add(menuItem, "name_237298221694500");
-		panel_3.add(panel_5, "4, 2, fill, fill");
+		cmbTipeRuangan.setModel(new DefaultComboBoxModel(new String[] {"Reguler", "VIP", "Extended"}));
+		panelJenisRuangan.add(cmbTipeRuangan, "4, 2, fill, default");
 		
 		JLabel lblRuangan = new JLabel("Ruangan");
 		lblRuangan.setFont(new Font("SansSerif", Font.PLAIN, 14));
-		
-		JPanel panel = new JPanel();
-		panel.setLayout(new CardLayout(0, 0));
-		
-		JButton btnNewButton_1 = new JButton("R-01");
-		panel.add(btnNewButton_1, "name_237313129570600");
-		
-		JMenuItem mntmNewMenuItem = new JMenuItem("New menu item");
-		panel.add(mntmNewMenuItem, "name_237313140836100");
-		panel_2.setLayout(new FormLayout(new ColumnSpec[] {
+		panelRuangan.setLayout(new FormLayout(new ColumnSpec[] {
 				FormSpecs.LABEL_COMPONENT_GAP_COLSPEC,
 				ColumnSpec.decode("58px"),
-				ColumnSpec.decode("74px"),
+				ColumnSpec.decode("74px:grow"),
 				ColumnSpec.decode("268px"),},
 			new RowSpec[] {
 				FormSpecs.LINE_GAP_ROWSPEC,
 				RowSpec.decode("28px"),}));
-		panel_2.add(lblRuangan, "2, 2, left, top");
-		panel_2.add(panel, "4, 2, fill, top");
+		panelRuangan.add(lblRuangan, "2, 2, right, top");
 		
-		JLabel lblNewLabel = new JLabel("Nama Pembooking");
-		lblNewLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+		cmbRuangan.setModel(new DefaultComboBoxModel(new String[] {"R-01", "V-01", "X-01"}));
+		panelRuangan.add(cmbRuangan, "4, 2");
 		
-		textField = new JTextField();
-		textField.setColumns(10);
-		panel_1.setLayout(new FormLayout(new ColumnSpec[] {
+		JLabel lblNamaPembooking = new JLabel("Nama Pembooking");
+		lblNamaPembooking.setFont(new Font("SansSerif", Font.PLAIN, 14));
+		
+		
+		txtNamaPembooking.setColumns(10);
+		panelNamaPembooking.setLayout(new FormLayout(new ColumnSpec[] {
 				FormSpecs.LABEL_COMPONENT_GAP_COLSPEC,
 				ColumnSpec.decode("118px"),
 				FormSpecs.UNRELATED_GAP_COLSPEC,
@@ -261,8 +246,10 @@ public class Tb1PboMangaCafeView {
 			new RowSpec[] {
 				FormSpecs.RELATED_GAP_ROWSPEC,
 				RowSpec.decode("28px"),}));
-		panel_1.add(lblNewLabel, "2, 2, left, center");
-		panel_1.add(textField, "4, 2, default, center");
+		panelNamaPembooking.add(lblNamaPembooking, "2, 2, left, center");
+		panelNamaPembooking.add(txtNamaPembooking, "4, 2, default, center");
+		
+		tabbedPane.addTab("Ruangan Tersewa", null, list, null);
 		
 		JScrollPane scrollPane = new JScrollPane();
 		tabbedPane.addTab("Ketersedian Ruangan", null, scrollPane, null);
@@ -274,7 +261,33 @@ public class Tb1PboMangaCafeView {
 		list = new JList<String>(demoList);
 		tabbedPane.addTab("Ruangan Tersewa", null, list, null);
 		frmMangaCafe.getContentPane().setLayout(groupLayout);
+		
+		
+		btnTambah.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
+		
+		
+		btnHapus.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		
+		btnEdit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+
+		btnPesan.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				sewaRuangan();
+			}
+		});
+		
+		readRuangCafe();
 	}
+	
 	private static void addPopup(Component component, final JPopupMenu popup) {
 		component.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
@@ -293,13 +306,51 @@ public class Tb1PboMangaCafeView {
 		});
 	}
 	
+	protected void sewaRuangan() {
+		String namaPembooking = txtNamaPembooking.getText();
+		String namaRuangan;
+		switch (cmbRuangan.getSelectedIndex()) {
+			case 0:
+				namaRuangan = "R-01";
+				break;
+			case 1:
+				namaRuangan = "V-01";
+				break;
+			case 2:
+				namaRuangan = "X-01";
+				break;
+			default:
+				namaRuangan = "R-01";
+		}
+		
+		String jenisRuangan;
+		switch (cmbTipeRuangan.getSelectedIndex()) {
+			case 0:
+				jenisRuangan = "Reguler";
+				break;
+			case 1:
+				jenisRuangan = "VIP";
+				break;
+			case 2:
+				jenisRuangan = "Extended";
+				break;
+			default:
+				jenisRuangan = "Reguler";
+		}
+		int jumlahSlot = Integer.parseInt(txtJumlahSlot.getText());
+		RuangCafe ruangCafe = new RuangCafe(namaPembooking, namaRuangan, jenisRuangan, jumlahSlot, 20);
+		ruanganTersewa.add(ruangCafe);
+		recordRuangCafe();
+	}
+	
 	private void recordRuangCafe() {
 		try {
-			String fileName = "data_ruang.txt";
+			String fileName = "data_ruang_tersewa.txt";
 			FileOutputStream fos = new FileOutputStream(fileName);
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
-			oos.writeObject(daftarRuang);
+			oos.writeObject(ruanganTersewa);
 			oos.close();
+			JOptionPane.showMessageDialog(null, "Ruangan Berhasil Disimpan!");
 		} catch (FileNotFoundException e) {
 			JOptionPane.showMessageDialog(null, "File tidak bisa ditemukan.\nPesan kesalahan: " + e.getMessage());
 		} catch (IOException e) {
@@ -310,13 +361,13 @@ public class Tb1PboMangaCafeView {
 	@SuppressWarnings("unchecked")
 	protected void readRuangCafe() {
 		try {
-			String fileName = "data_ruang.txt";
+			String fileName = "data_ruang_tersewa.txt";
 			FileInputStream fis = new FileInputStream(fileName);
 			ObjectInputStream ois = new ObjectInputStream(fis);
-			daftarRuang = (ArrayList<RuangCafe>) ois.readObject();
+			ruanganTersewa = (ArrayList<RuangCafe>) ois.readObject();
 			ois.close();
 		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(null, "File tidak bisa ditemukan.\nPesan kesalahan: " + e.getMessage());
+//			JOptionPane.showMessageDialog(null, "File tidak bisa ditemukan.\nPesan kesalahan: " + e.getMessage());
 		} catch (ClassNotFoundException e) {
 //			JOptionPane.showMessageDialog(null, "Class tidak bisa ditemukan.\nPesan kesalahan: " + e.getMessage());
 		} catch (IOException e) {

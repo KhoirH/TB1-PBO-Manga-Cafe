@@ -3,32 +3,43 @@ package com.mercubuana.Tb1PboMangaCafeView;
 import java.io.Serializable;
 
 public class RuangCafe implements Serializable {
-	private String namaRuang;
-    private char jenisRuang;
-    private int jumlahSlotSewaHarian;
-    private int sisaSlotSewaHarian;
-
-    public RuangCafe(String namaRuang, char jenisRuang, int jumlahSlotSewaHarian, int sisaSlotSewaHarian) {
-        this.namaRuang = namaRuang;
-        this.jenisRuang = jenisRuang;
-        this.jumlahSlotSewaHarian = jumlahSlotSewaHarian;
-        this.sisaSlotSewaHarian = sisaSlotSewaHarian;
-    }
-
-	public String getNamaRuang() {
-		return namaRuang;
+	private String namaPembooking;
+	private String namaRuangan;
+	private String jenisRuangan;
+	private int jumlahSlotSewaHarian;
+	private int sisaSLotSewaHarian;
+	
+	public RuangCafe(String namaPembooking, String namaRuangan, String jenisRuangan, int jumlahSlotSewaHarian, int sisaSLotSewaHarian) {
+		super();
+		this.namaPembooking = namaPembooking;
+		this.namaRuangan = namaRuangan;
+		this.jenisRuangan = jenisRuangan;
+		this.jumlahSlotSewaHarian = jumlahSlotSewaHarian;
+		this.sisaSLotSewaHarian = sisaSLotSewaHarian;
 	}
 
-	public void setNamaRuang(String namaRuang) {
-		this.namaRuang = namaRuang;
+	public String getNamaPembooking() {
+		return namaPembooking;
 	}
 
-	public char getJenisRuang() {
-		return jenisRuang;
+	public void setNamaPembooking(String namaPembooking) {
+		this.namaPembooking = namaPembooking;
 	}
 
-	public void setJenisRuang(char jenisRuang) {
-		this.jenisRuang = jenisRuang;
+	public String getNamaRuangan() {
+		return namaRuangan;
+	}
+
+	public void setNamaRuangan(String namaRuangan) {
+		this.namaRuangan = namaRuangan;
+	}
+
+	public String getJenisRuangan() {
+		return jenisRuangan;
+	}
+
+	public void setJenisRuangan(String jenisRuangan) {
+		this.jenisRuangan = jenisRuangan;
 	}
 
 	public int getJumlahSlotSewaHarian() {
@@ -39,12 +50,13 @@ public class RuangCafe implements Serializable {
 		this.jumlahSlotSewaHarian = jumlahSlotSewaHarian;
 	}
 
-	public int getSisaSlotSewaHarian() {
-		return sisaSlotSewaHarian;
+	public int getSisaSLotSewaHarian() {
+		return sisaSLotSewaHarian;
 	}
 
-	public void setSisaSlotSewaHarian(int sisaSlotSewaHarian) {
-		this.sisaSlotSewaHarian = sisaSlotSewaHarian;
+	public void setSisaSLotSewaHarian(int sisaSLotSewaHarian) {
+		this.sisaSLotSewaHarian = sisaSLotSewaHarian;
 	}
-    
+	
+	
 }
