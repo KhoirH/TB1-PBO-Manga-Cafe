@@ -65,7 +65,7 @@ public class Tb1PboMangaCafeView {
 	private JComboBox cmbTipeRuangan;
 	
 	private ArrayList<RuangCafe> ruanganTersewa = new ArrayList<RuangCafe>();
-	
+	private int activeRuanganIndex = -1;
 
 	/**
 	 * Launch the application.
@@ -244,18 +244,20 @@ public class Tb1PboMangaCafeView {
 		
 		btnHapus.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				deleteRuanganTersewa();
 			}
 		});
 		
 		btnEdit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				editRuanganTersewa();
 			}
 		});
 
 		btnPesan.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				readRuangCafe();
-				sewaRuangan();
+				submit();
 			}
 		});
 		
@@ -366,7 +368,7 @@ public class Tb1PboMangaCafeView {
 		scrollPane.setViewportView(table);	
 	}
 	
-	protected void sewaRuangan() {
+	protected void submit() {
 		String namaPembooking = txtNamaPembooking.getText();
 		String namaRuangan;
 		switch (cmbRuangan.getSelectedIndex()) {
@@ -399,24 +401,74 @@ public class Tb1PboMangaCafeView {
 		}
 		int jumlahSlot = Integer.parseInt(txtJumlahSlot.getText());
 		RuangCafe ruangCafe = new RuangCafe(namaPembooking, namaRuangan, jenisRuangan, jumlahSlot, 20);
-		ruanganTersewa.add(ruangCafe);
-		recordRuangCafe();
+		if (activeRuanganIndex == -1) {
+			ruanganTersewa.add(ruangCafe);
+		} else {
+			ruanganTersewa.get(activeRuanganIndex).setNamaPembooking(namaPembooking);
+			ruanganTersewa.get(activeRuanganIndex).setNamaRuangan(namaRuangan);
+			ruanganTersewa.get(activeRuanganIndex).setJenisRuangan(jenisRuangan);
+		}
+		recordRuangCafe(activeRuanganIndex == -1 ? "Ruangan Berhasil Disimpan" : "Ruangan Berhasil Di Edit");
+		getDataRuangan();
+		resetForm();
+	}
+	
+	private void deleteRuanganTersewa() {
+		int index = list.getSelectedIndex();
+		ruanganTersewa.remove(index);
+		recordRuangCafe("Ruangan Berhasil Dihapus");
 		getDataRuangan();
 	}
 	
-	private void recordRuangCafe() {
+	private void editRuanganTersewa() {
+		int index = list.getSelectedIndex();
+		activeRuanganIndex = index;
+		RuangCafe ruangan = ruanganTersewa.get(index);
+		txtNamaPembooking.setText(ruangan.getNamaPembooking());
+		txtJumlahSlot.setText(Integer.toString(ruangan.getJumlahSlotSewaHarian()));
+		
+		switch (ruangan.getNamaRuangan()) {
+			case "R-01":
+				cmbRuangan.setSelectedIndex(0);
+				break;
+			case "V-01":
+				cmbRuangan.setSelectedIndex(1);
+				break;
+			case "X-01":
+				cmbRuangan.setSelectedIndex(2);
+				break;
+			default:
+				cmbRuangan.setSelectedIndex(0);
+		}
+		switch (ruangan.getJenisRuangan()) {
+			case "Reguler":
+				cmbTipeRuangan.setSelectedIndex(0);
+				break;
+			case "VIP":
+				cmbTipeRuangan.setSelectedIndex(1);
+				break;
+			case "Extended":
+				cmbTipeRuangan.setSelectedIndex(2);
+				break;
+			default:
+				cmbTipeRuangan.setSelectedIndex(0);
+		}
+	}
+	
+	private void recordRuangCafe(String message) {
 		try {
 			String fileName = "data_ruang_tersewa.txt";
 			FileOutputStream fos = new FileOutputStream(fileName);
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
 			oos.writeObject(ruanganTersewa);
 			oos.close();
-			JOptionPane.showMessageDialog(null, "Ruangan Berhasil Disimpan!");
+			JOptionPane.showMessageDialog(null, message);
 		} catch (FileNotFoundException e) {
 			JOptionPane.showMessageDialog(null, "File tidak bisa ditemukan.\nPesan kesalahan: " + e.getMessage());
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(null, "Terjadi error pada saat merekam data ke storage.\n Pesan kesalahan: " + e.getMessage());
 		}
+		activeRuanganIndex = -1;
 	}
 	
 	public void dropdownComponent(String[] args) {
@@ -465,5 +517,12 @@ public class Tb1PboMangaCafeView {
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(null, "Terjadi error pada saat merekam data ke storage.\n Pesan kesalahan: " + e.getMessage());
 		}
+	}
+	
+	private void resetForm() {
+		txtNamaPembooking.setText("");
+		txtJumlahSlot.setText("");;
+		cmbRuangan.setSelectedIndex(0);
+		cmbTipeRuangan.setSelectedIndex(0);
 	}
 }
