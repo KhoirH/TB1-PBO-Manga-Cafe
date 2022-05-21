@@ -295,7 +295,7 @@ public class Tb1PboMangaCafeView {
             "No", "Ruang", "Jenis", "Sisa Ruang"
         };
          
-        int slotRuang = 10;
+        int slotRuang = 20;
         int totalR1VIP = 0;
         int totalR1Extended = 0;
         int totalR1Reguler = 0;
