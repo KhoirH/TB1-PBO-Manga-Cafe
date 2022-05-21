@@ -193,7 +193,7 @@ public class Tb1PboMangaCafeView {
 		
 		JLabel lblJenisRuangan = new JLabel("Jenis Ruangan");
 		lblJenisRuangan.setFont(new Font("SansSerif", Font.PLAIN, 14));
-		panelJenisRuangan.add(lblJenisRuangan, "2, 2, right, fill");
+		panelJenisRuangan.add(lblJenisRuangan, "2, 2, left, fill");
 		
 		cmbTipeRuangan.setModel(new DefaultComboBoxModel(new String[] {"Reguler", "VIP", "Extended"}));
 		panelJenisRuangan.add(cmbTipeRuangan, "4, 2, fill, default");
@@ -238,6 +238,7 @@ public class Tb1PboMangaCafeView {
 		
 		btnTambah.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				toEditFunction();
 			}
 		});
 		
@@ -262,7 +263,13 @@ public class Tb1PboMangaCafeView {
 		});
 		
 	}
-	
+	public  void toEditFunction() {
+		activeRuanganIndex = -1;
+		txtNamaPembooking.setText("");
+		txtJumlahSlot.setText("");
+		cmbRuangan.setSelectedIndex(0);
+		cmbTipeRuangan.setSelectedIndex(0);
+	}
 	private static void addPopup(Component component, final JPopupMenu popup) {
 		component.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
