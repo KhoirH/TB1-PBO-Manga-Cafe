@@ -75,7 +75,7 @@ public class Tb1PboMangaCafeView {
 	private ArrayList<RuangCafe> ruanganTersewa = new ArrayList<RuangCafe>();
 	private int activeRuanganIndex = -1;
 
-	private Connection connection;
+	public Connection connection;
 	/**
 	 * Launch the application.
 	 */
@@ -84,7 +84,8 @@ public class Tb1PboMangaCafeView {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Tb1PboMangaCafeView window = new Tb1PboMangaCafeView();
+
+		            Tb1PboMangaCafeView window = new Tb1PboMangaCafeView();
 					window.frmMangaCafe.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -97,6 +98,7 @@ public class Tb1PboMangaCafeView {
 	 * Create the application.
 	 */
 	public Tb1PboMangaCafeView() {
+		this.connection = MySQLConnection.getConnection();
 		initialize();
 	}
 
@@ -106,33 +108,7 @@ public class Tb1PboMangaCafeView {
 	
 	@SuppressWarnings("unchecked")
 	private void initialize() {
-		
-		String query = "SELECT * FROM ruang_cafe where nama_pembooking='hilmi'";
 
-        try {           
-            connection = MySQLConnection.getConnection();
-            Statement statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery(query);
-             
-         // Create a Logger
-            Logger logger
-                = Logger.getLogger(
-                		Tb1PboMangaCafeView.class.getName());
-            
-            if(rs.next()) {
-            	logger.log(Level.INFO, rs.getInt("id_pembooking") + "" );
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
 		
 		frmMangaCafe = new JFrame();
 		frmMangaCafe.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -326,91 +302,66 @@ public class Tb1PboMangaCafeView {
 		});
 	}
 	
-	protected void getDataRuangan() {
-		tabbedPane.removeAll();
-		//headers for the table
-        String[] columns = new String[] {
-            "No", "Ruang", "Jenis", "Sisa Ruang"
-        };
-         
-        int slotRuang = 20;
-        int totalR1VIP = 0;
-        int totalR1Extended = 0;
-        int totalR1Reguler = 0;
-        int totalV1VIP = 0;
-        int totalV1Extended = 0;
-        int totalV1Reguler = 0;
-        int totalX1VIP = 0;
-        int totalX1Extended = 0;
-        int totalX1Reguler = 0;
-    	
-		DefaultListModel<String> demoList = new DefaultListModel<String>();	
-
-		// loop data booking place
-		for (RuangCafe rt : ruanganTersewa) {
+	protected void getDataRuangan(){
+		try {
+			tabbedPane.removeAll();
+			String[] columns = new String[] {
+	            "No", "Ruang", "Jenis", "Sisa Ruang"
+	        };
+		      
+			DefaultListModel<String> demoList = new DefaultListModel<String>();	
+		    String query = "select * from ruang_cafe";
+		    Statement statement = this.connection.createStatement();
+	        ResultSet rs = statement.executeQuery(query);
+	         
 			
-			
-			
-			String jenisRuang = rt.getJenisRuangan();
-			String namaRuang= rt.getNamaRuangan();
-			int jumlahSlotSewaHarian = rt.getJumlahSlotSewaHarian();
-			String stringJumlahSlotSewaHarian= "" + rt.getJumlahSlotSewaHarian();
-			String namaPembooking= rt.getNamaPembooking();
-			
-
-			if ( namaRuang.equals("R-01") && jenisRuang.equals("Reguler")) {
-				totalR1Reguler += jumlahSlotSewaHarian;
-			}
-			if ( namaRuang.equals("R-01") && jenisRuang.equals("VIP")) {
-				totalR1VIP += jumlahSlotSewaHarian;
-			}
-			if ( namaRuang.equals("R-01") && jenisRuang.equals("Extended")) {
-				totalR1Extended += jumlahSlotSewaHarian;
-			}
-			if ( namaRuang.equals("V-01") && jenisRuang.equals("Reguler")) {
-				totalV1Reguler += jumlahSlotSewaHarian;
-			}
-			if ( namaRuang.equals("V-01") && jenisRuang.equals("VIP")) {
-				totalV1VIP += jumlahSlotSewaHarian;
-			}
-			if ( namaRuang.equals("V-01") && jenisRuang.equals("Extended")) {
-				totalV1Extended += jumlahSlotSewaHarian;
-			}
-			if ( namaRuang.equals("X-01") && jenisRuang.equals("Reguler")) {
-				totalX1Reguler += jumlahSlotSewaHarian;
-			}
-			if ( namaRuang.equals("X-01") && jenisRuang.equals("VIP")) {
-				totalX1VIP += jumlahSlotSewaHarian;
-			}
-			if ( namaRuang.equals("X-01") && jenisRuang.equals("Extended")) {
-				totalX1Extended += jumlahSlotSewaHarian;
-			}
-			// list booking place
-			String listString = namaPembooking + " " + namaRuang + "-" + jenisRuang + "(" + stringJumlahSlotSewaHarian + ")" ;
-			demoList.addElement(listString);
-		}
-		
-        //actual data for the table in a 2d array
-        Object[][] dataTable = new Object[][] {
-            { 1, "R-01", "Reguler", slotRuang - totalR1Reguler },
-            { 2, "R-01", "VIP", slotRuang - totalR1VIP },
-            { 3, "R-01", "Extended", slotRuang - totalR1Extended },
-            { 4, "V-01", "Reguler", slotRuang - totalV1Reguler },
-            { 5, "V-01", "VIP", slotRuang - totalV1VIP },
-            { 6, "V-01", "Extended", slotRuang - totalV1Extended },
-            { 7, "X-01", "Reguler", slotRuang - totalX1Reguler },
-            { 8, "X-01", "VIP", slotRuang - totalX1VIP },
-            { 9, "X-01", "Extended", slotRuang - totalX1Extended },
-        };
+			// loop data booking place
+			while (rs.next()) {
+				
+				String namaPembooking = rs.getString("nama_pembooking");
+				int stringJumlahSlotSewaHarian = rs.getInt("jumlah_slot_sewa_harian");
 	
-		list = new JList<String>(demoList);
-		
-
-		tabbedPane.addTab("Ruangan Tersewa", null, list, null);	
-		JScrollPane scrollPane = new JScrollPane();
-		tabbedPane.addTab("Ketersedian Ruangan", null, scrollPane, null);
-		table = new JTable(dataTable, columns);
-		scrollPane.setViewportView(table);	
+				// list booking place
+				String listString = namaPembooking + " " + "namaRuang" + "-" + "jenisRuang" + "(" + stringJumlahSlotSewaHarian + ")" ;
+				demoList.addElement(listString);
+			}
+			
+	        //actual data for the table in a 2d array
+	//        Object[][] dataTable = new Object[][] {
+	//            { 1, "R-01", "Reguler", slotRuang - totalR1Reguler },
+	//            { 2, "R-01", "VIP", slotRuang - totalR1VIP },
+	//            { 3, "R-01", "Extended", slotRuang - totalR1Extended },
+	//            { 4, "V-01", "Reguler", slotRuang - totalV1Reguler },
+	//            { 5, "V-01", "VIP", slotRuang - totalV1VIP },
+	//            { 6, "V-01", "Extended", slotRuang - totalV1Extended },
+	//            { 7, "X-01", "Reguler", slotRuang - totalX1Reguler },
+	//            { 8, "X-01", "VIP", slotRuang - totalX1VIP },
+	//            { 9, "X-01", "Extended", slotRuang - totalX1Extended },
+	//        };
+			
+			 //actual data for the table in a 2d array
+		      Object[][] dataTable = new Object[][] {
+		          { 1, "R-01", "Reguler", 0 },
+		          { 2, "R-01", "VIP", 0 },
+		          { 3, "R-01", "Extended", 0 },
+		          { 4, "V-01", "Reguler", 0 },
+		          { 5, "V-01", "VIP", 0 },
+		          { 6, "V-01", "Extended", 0 },
+		          { 7, "X-01", "Reguler", 0 },
+		          { 8, "X-01", "VIP", 0},
+		          { 9, "X-01", "Extended", 0 },
+		      };
+			list = new JList<String>(demoList);
+			
+	
+			tabbedPane.addTab("Ruangan Tersewa", null, list, null);	
+			JScrollPane scrollPane = new JScrollPane();
+			tabbedPane.addTab("Ketersedian Ruangan", null, scrollPane, null);
+			table = new JTable(dataTable, columns);
+			scrollPane.setViewportView(table);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 	}
 	
 	protected void submit() {
