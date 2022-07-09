@@ -16,7 +16,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
@@ -40,6 +46,8 @@ import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.FormSpecs;
 import com.jgoodies.forms.layout.RowSpec;
+import com.mysql.cj.xdevapi.Result;
+
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 
@@ -67,10 +75,12 @@ public class Tb1PboMangaCafeView {
 	private ArrayList<RuangCafe> ruanganTersewa = new ArrayList<RuangCafe>();
 	private int activeRuanganIndex = -1;
 
+	private Connection connection;
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -96,6 +106,34 @@ public class Tb1PboMangaCafeView {
 	
 	@SuppressWarnings("unchecked")
 	private void initialize() {
+		
+		String query = "SELECT * FROM ruang_cafe where nama_pembooking='hilmi'";
+
+        try {           
+            connection = MySQLConnection.getConnection();
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(query);
+             
+         // Create a Logger
+            Logger logger
+                = Logger.getLogger(
+                		Tb1PboMangaCafeView.class.getName());
+            
+            if(rs.next()) {
+            	logger.log(Level.INFO, rs.getInt("id_pembooking") + "" );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+		
 		frmMangaCafe = new JFrame();
 		frmMangaCafe.setFont(new Font("Arial", Font.PLAIN, 12));
 		frmMangaCafe.setTitle("Manga cafe");
