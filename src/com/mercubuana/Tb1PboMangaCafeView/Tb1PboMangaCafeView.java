@@ -16,7 +16,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -75,7 +74,6 @@ public class Tb1PboMangaCafeView {
 	private ArrayList<RuangCafe> ruanganTersewa = new ArrayList<RuangCafe>();
 	private int activeRuanganIndex = -1;
 
-	public Connection connection;
 	/**
 	 * Launch the application.
 	 */
@@ -98,7 +96,6 @@ public class Tb1PboMangaCafeView {
 	 * Create the application.
 	 */
 	public Tb1PboMangaCafeView() {
-		this.connection = MySQLConnection.getConnection();
 		initialize();
 	}
 
@@ -301,67 +298,68 @@ public class Tb1PboMangaCafeView {
 			}
 		});
 	}
-	
-	protected void getDataRuangan(){
+	protected void getDataRuangan() {
+		tabbedPane.removeAll();
+		String[] columns = new String[] {
+            "No", "Ruang", "Jenis", "Sisa Ruang"
+        };
+	      
+		DefaultListModel<String> demoList = new DefaultListModel<String>();	
+	     
+		ResultSet rsOrdering = MySQLConnection.SelectData("SELECT jenis_ruangan, nama_ruangan.name as nama_ruangan, sisa_slot_sewa_harian, nama_pembooking, jumlah_slot_sewa_harian  from ruang_cafe INNER JOIN nama_ruangan on ruang_cafe.nama_ruangan = nama_ruangan.id ");
+		// loop data booking place
 		try {
-			tabbedPane.removeAll();
-			String[] columns = new String[] {
-	            "No", "Ruang", "Jenis", "Sisa Ruang"
-	        };
-		      
-			DefaultListModel<String> demoList = new DefaultListModel<String>();	
-		    String query = "select * from ruang_cafe";
-		    Statement statement = this.connection.createStatement();
-	        ResultSet rs = statement.executeQuery(query);
-	         
-			
-			// loop data booking place
-			while (rs.next()) {
+			while (rsOrdering.next()) {
 				
-				String namaPembooking = rs.getString("nama_pembooking");
-				int stringJumlahSlotSewaHarian = rs.getInt("jumlah_slot_sewa_harian");
-	
+				String namaPembooking = rsOrdering.getString("nama_pembooking");
+				int stringJumlahSlotSewaHarian = rsOrdering.getInt("jumlah_slot_sewa_harian");
+
+				String namaRuang = rsOrdering.getString("nama_ruangan");
+
+				int jenisRuang = rsOrdering.getInt("jenis_ruangan");
 				// list booking place
-				String listString = namaPembooking + " " + "namaRuang" + "-" + "jenisRuang" + "(" + stringJumlahSlotSewaHarian + ")" ;
+				String listString = namaPembooking + " " + namaRuang + "-" + jenisRuang + "(" + stringJumlahSlotSewaHarian + ")" ;
 				demoList.addElement(listString);
 			}
-			
-	        //actual data for the table in a 2d array
-	//        Object[][] dataTable = new Object[][] {
-	//            { 1, "R-01", "Reguler", slotRuang - totalR1Reguler },
-	//            { 2, "R-01", "VIP", slotRuang - totalR1VIP },
-	//            { 3, "R-01", "Extended", slotRuang - totalR1Extended },
-	//            { 4, "V-01", "Reguler", slotRuang - totalV1Reguler },
-	//            { 5, "V-01", "VIP", slotRuang - totalV1VIP },
-	//            { 6, "V-01", "Extended", slotRuang - totalV1Extended },
-	//            { 7, "X-01", "Reguler", slotRuang - totalX1Reguler },
-	//            { 8, "X-01", "VIP", slotRuang - totalX1VIP },
-	//            { 9, "X-01", "Extended", slotRuang - totalX1Extended },
-	//        };
-			
-			 //actual data for the table in a 2d array
-		      Object[][] dataTable = new Object[][] {
-		          { 1, "R-01", "Reguler", 0 },
-		          { 2, "R-01", "VIP", 0 },
-		          { 3, "R-01", "Extended", 0 },
-		          { 4, "V-01", "Reguler", 0 },
-		          { 5, "V-01", "VIP", 0 },
-		          { 6, "V-01", "Extended", 0 },
-		          { 7, "X-01", "Reguler", 0 },
-		          { 8, "X-01", "VIP", 0},
-		          { 9, "X-01", "Extended", 0 },
-		      };
-			list = new JList<String>(demoList);
-			
-	
-			tabbedPane.addTab("Ruangan Tersewa", null, list, null);	
-			JScrollPane scrollPane = new JScrollPane();
-			tabbedPane.addTab("Ketersedian Ruangan", null, scrollPane, null);
-			table = new JTable(dataTable, columns);
-			scrollPane.setViewportView(table);
-		} catch (Exception e) {
-			// TODO: handle exception
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
+		ResultSet rsSum = MySQLConnection.SelectData("SELECT jenis_ruangan, nama_ruangan.name as nama_ruangan, MIN(sisa_slot_sewa_harian) as sisa_slot_sewa_harian  from ruang_cafe INNER JOIN nama_ruangan on ruang_cafe.nama_ruangan = nama_ruangan.id GROUP by ruang_cafe.nama_ruangan, ruang_cafe.jenis_ruangan");
+					
+		 //actual data for the table in a 2d array
+	      ArrayList<Object[]> dataTempTable = new ArrayList<Object[]>();
+	      int i = 0;
+	      try {
+			while (rsSum.next()) {
+				 
+				Object[] data = {
+						i, rsSum.getString("nama_ruangan"), rsSum.getString("jenis_ruangan"), rsSum.getString("sisa_slot_sewa_harian")
+				};
+				
+				i++;
+				dataTempTable.add(data);
+			  }
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		list = new JList<String>(demoList);
+		System.out.print(dataTempTable.get(0));
+		
+		Object[][] dataTable = new Object[dataTempTable.toArray().length][4];
+		
+		for (int itt = 0; itt < dataTempTable.toArray().length; itt++) {
+			dataTable[itt] = dataTempTable.get(itt);
+		}
+		
+
+		tabbedPane.addTab("Ruangan Tersewa", null, list, null);	
+		JScrollPane scrollPane = new JScrollPane();
+		tabbedPane.addTab("Ketersedian Ruangan", null, scrollPane, null);
+			table = new JTable(dataTable, columns);
+		scrollPane.setViewportView(table);
 	}
 	
 	protected void submit() {

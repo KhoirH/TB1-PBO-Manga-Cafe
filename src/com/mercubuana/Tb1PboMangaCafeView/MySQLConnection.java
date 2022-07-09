@@ -3,7 +3,9 @@ package com.mercubuana.Tb1PboMangaCafeView;
 //Step 1: Use interfaces from java.sql package 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class MySQLConnection {
   //static reference to itself
@@ -37,5 +39,16 @@ public class MySQLConnection {
    
   public static Connection getConnection() {
       return instance.createConnection();
+  }
+  
+  public static ResultSet SelectData(String query) {
+	  ResultSet rs = null;
+		try {
+			Statement statement = instance.createConnection().createStatement();
+	        rs = statement.executeQuery(query);
+		} catch (SQLException e) {
+	          System.out.println("ERROR: " + e.toString() );
+		}        
+        return rs;
   }
 }
