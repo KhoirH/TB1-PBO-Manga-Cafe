@@ -66,6 +66,7 @@ public class Tb1PboMangaCafeView {
 	private JButton btnEdit;
 	private JButton btnPesan;
 	
+	private JTextField txtIdPembooking;
 	private JTextField txtNamaPembooking;
 	private JTextField txtJumlahSlot;
 	private JComboBox cmbRuangan;
@@ -73,6 +74,7 @@ public class Tb1PboMangaCafeView {
 	
 	private ArrayList<RuangCafe> ruanganTersewa = new ArrayList<RuangCafe>();
 	private int activeRuanganIndex = -1;
+	private int activeId = -1;
 
 	/**
 	 * Launch the application.
@@ -239,12 +241,7 @@ public class Tb1PboMangaCafeView {
 				RowSpec.decode("28px"),}));
 		panelNamaPembooking.add(lblNamaPembooking, "2, 2, left, center");
 		panelNamaPembooking.add(txtNamaPembooking, "4, 2, default, center");
-
-			 
-		readRuangCafe();
 		getDataRuangan();
-		
-		
 		frmMangaCafe.getContentPane().setLayout(groupLayout);
 		
 		btnTambah.addActionListener(new ActionListener() {
@@ -268,7 +265,6 @@ public class Tb1PboMangaCafeView {
 
 		btnPesan.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				readRuangCafe();
 				submit();
 			}
 		});
@@ -276,6 +272,7 @@ public class Tb1PboMangaCafeView {
 	}
 	public  void toEditFunction() {
 		activeRuanganIndex = -1;
+		activeId = -1;
 		txtNamaPembooking.setText("");
 		txtJumlahSlot.setText("");
 		cmbRuangan.setSelectedIndex(0);
@@ -301,15 +298,16 @@ public class Tb1PboMangaCafeView {
 	protected void getDataRuangan() {
 		tabbedPane.removeAll();
 		String[] columns = new String[] {
-            "No", "Ruang", "Jenis", "Sisa Ruang"
+            "No", "ID", "Ruang", "Jenis", "Sisa Ruang"
         };
 	      
 		DefaultListModel<String> demoList = new DefaultListModel<String>();	
 	     
-		ResultSet rsOrdering = MySQLConnection.SelectData("SELECT jenis_ruangan, nama_ruangan.name as nama_ruangan, sisa_slot_sewa_harian, nama_pembooking, jumlah_slot_sewa_harian  from ruang_cafe INNER JOIN nama_ruangan on ruang_cafe.nama_ruangan = nama_ruangan.id ");
+		ResultSet rsOrdering = MySQLConnection.SelectData("SELECT id_pembooking, jenis_ruangan, nama_ruangan.name as nama_ruangan, sisa_slot_sewa_harian, nama_pembooking, jumlah_slot_sewa_harian  from ruang_cafe INNER JOIN nama_ruangan on ruang_cafe.nama_ruangan = nama_ruangan.id ");
 		// loop data booking place
 		try {
 			while (rsOrdering.next()) {
+				int idPembooking = rsOrdering.getInt("id_pembooking");
 				
 				String namaPembooking = rsOrdering.getString("nama_pembooking");
 				int stringJumlahSlotSewaHarian = rsOrdering.getInt("jumlah_slot_sewa_harian");
@@ -317,16 +315,20 @@ public class Tb1PboMangaCafeView {
 				String namaRuang = rsOrdering.getString("nama_ruangan");
 
 				int jenisRuang = rsOrdering.getInt("jenis_ruangan");
+				int sisaSlotSewaHarian = rsOrdering.getInt("sisa_slot_sewa_harian");
 				// list booking place
-				String listString = namaPembooking + " " + namaRuang + "-" + jenisRuang + "(" + stringJumlahSlotSewaHarian + ")" ;
+				String listString = idPembooking + " - " + namaPembooking + " - " + namaRuang + "-" + jenisRuang + "(" + stringJumlahSlotSewaHarian + ")" ;
 				demoList.addElement(listString);
+				
+				RuangCafe ruangCafe = new RuangCafe(idPembooking, namaPembooking, namaRuang, "" + jenisRuang + "", stringJumlahSlotSewaHarian, sisaSlotSewaHarian);
+				ruanganTersewa.add(ruangCafe);
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		ResultSet rsSum = MySQLConnection.SelectData("SELECT jenis_ruangan, nama_ruangan.name as nama_ruangan, MIN(sisa_slot_sewa_harian) as sisa_slot_sewa_harian  from ruang_cafe INNER JOIN nama_ruangan on ruang_cafe.nama_ruangan = nama_ruangan.id GROUP by ruang_cafe.nama_ruangan, ruang_cafe.jenis_ruangan");
+		ResultSet rsSum = MySQLConnection.SelectData("SELECT id_pembooking, jenis_ruangan, nama_ruangan.name as nama_ruangan, MIN(sisa_slot_sewa_harian) as sisa_slot_sewa_harian  from ruang_cafe INNER JOIN nama_ruangan on ruang_cafe.nama_ruangan = nama_ruangan.id GROUP by ruang_cafe.id_pembooking, ruang_cafe.nama_ruangan, ruang_cafe.jenis_ruangan");
 					
 		 //actual data for the table in a 2d array
 	      ArrayList<Object[]> dataTempTable = new ArrayList<Object[]>();
@@ -335,7 +337,7 @@ public class Tb1PboMangaCafeView {
 			while (rsSum.next()) {
 				 
 				Object[] data = {
-						i, rsSum.getString("nama_ruangan"), rsSum.getString("jenis_ruangan"), rsSum.getString("sisa_slot_sewa_harian")
+						i, rsSum.getInt("id_pembooking"), rsSum.getString("nama_ruangan"), rsSum.getString("jenis_ruangan"), rsSum.getString("sisa_slot_sewa_harian")
 				};
 				
 				i++;
@@ -346,7 +348,6 @@ public class Tb1PboMangaCafeView {
 			e.printStackTrace();
 		} 
 		list = new JList<String>(demoList);
-		System.out.print(dataTempTable.get(0));
 		
 		Object[][] dataTable = new Object[dataTempTable.toArray().length][4];
 		
@@ -354,7 +355,6 @@ public class Tb1PboMangaCafeView {
 			dataTable[itt] = dataTempTable.get(itt);
 		}
 		
-
 		tabbedPane.addTab("Ruangan Tersewa", null, list, null);	
 		JScrollPane scrollPane = new JScrollPane();
 		tabbedPane.addTab("Ketersedian Ruangan", null, scrollPane, null);
@@ -394,7 +394,7 @@ public class Tb1PboMangaCafeView {
 				jenisRuangan = "Reguler";
 		}
 		int jumlahSlot = Integer.parseInt(txtJumlahSlot.getText());
-		RuangCafe ruangCafe = new RuangCafe(namaPembooking, namaRuangan, jenisRuangan, jumlahSlot, 20);
+		RuangCafe ruangCafe = new RuangCafe(activeId, namaPembooking, namaRuangan, jenisRuangan, jumlahSlot, 20);
 		if (activeRuanganIndex == -1) {
 			ruanganTersewa.add(ruangCafe);
 		} else {
@@ -402,15 +402,15 @@ public class Tb1PboMangaCafeView {
 			ruanganTersewa.get(activeRuanganIndex).setNamaRuangan(namaRuangan);
 			ruanganTersewa.get(activeRuanganIndex).setJenisRuangan(jenisRuangan);
 		}
-		recordRuangCafe(activeRuanganIndex == -1 ? "Ruangan Berhasil Disimpan" : "Ruangan Berhasil Di Edit");
+		recordRuangCafe(ruangCafe, activeRuanganIndex == -1 ? "Ruangan Berhasil Disimpan" : "Ruangan Berhasil Di Edit");
 		getDataRuangan();
 		resetForm();
 	}
 	
 	private void deleteRuanganTersewa() {
 		int index = list.getSelectedIndex();
+		int rsOrdering = MySQLConnection.executeUpdate("DELETE FROM `ruang_cafe` WHERE id_pembooking=" + "'" + ruanganTersewa.get(index).getIdPembooking() + "'" + "");
 		ruanganTersewa.remove(index);
-		recordRuangCafe("Ruangan Berhasil Dihapus");
 		getDataRuangan();
 	}
 	
@@ -418,6 +418,7 @@ public class Tb1PboMangaCafeView {
 		int index = list.getSelectedIndex();
 		activeRuanganIndex = index;
 		RuangCafe ruangan = ruanganTersewa.get(index);
+		activeId = ruangan.getIdPembooking();
 		txtNamaPembooking.setText(ruangan.getNamaPembooking());
 		txtJumlahSlot.setText(Integer.toString(ruangan.getJumlahSlotSewaHarian()));
 		
@@ -449,20 +450,23 @@ public class Tb1PboMangaCafeView {
 		}
 	}
 	
-	private void recordRuangCafe(String message) {
-		try {
-			String fileName = "data_ruang_tersewa.txt";
-			FileOutputStream fos = new FileOutputStream(fileName);
-			ObjectOutputStream oos = new ObjectOutputStream(fos);
-			oos.writeObject(ruanganTersewa);
-			oos.close();
-			JOptionPane.showMessageDialog(null, message);
-		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(null, "File tidak bisa ditemukan.\nPesan kesalahan: " + e.getMessage());
-		} catch (IOException e) {
-			JOptionPane.showMessageDialog(null, "Terjadi error pada saat merekam data ke storage.\n Pesan kesalahan: " + e.getMessage());
+	private void recordRuangCafe(RuangCafe ruangCafe, String message) {
+		if (ruangCafe != null) {
+			if (activeRuanganIndex == -1) {
+				int rsOrdering = MySQLConnection.executeUpdate("INSERT INTO `ruang_cafe`(`nama_pembooking`, `nama_ruangan`, `jenis_ruangan`, `jumlah_slot_sewa_harian`, `sisa_slot_sewa_harian`)"
+						+ "VALUES ('"
+						+ ruangCafe.getNamaPembooking() + "','"
+						+ (cmbRuangan.getSelectedIndex() + 1) + "', '"
+						+ (cmbTipeRuangan.getSelectedIndex() + 1) + "', '"
+						+ ruangCafe.getJumlahSlotSewaHarian() + "','"
+						+ ruangCafe.getSisaSLotSewaHarian() + "'"
+						+ ")");
+			} else {
+				int rsOrdering = MySQLConnection.executeUpdate("UPDATE `ruang_cafe` SET `nama_pembooking`='" + ruangCafe.getNamaPembooking() + "',`nama_ruangan`='" + (cmbRuangan.getSelectedIndex() + 1) + "',`jenis_ruangan`='" + (cmbTipeRuangan.getSelectedIndex() + 1) + "',`jumlah_slot_sewa_harian`='" + ruangCafe.getJumlahSlotSewaHarian() + "',`sisa_slot_sewa_harian`='" + ruangCafe.getSisaSLotSewaHarian() + "' WHERE id_pembooking=" + "'" + activeId + "'" + "");
+			}
 		}
 		activeRuanganIndex = -1;
+		activeId = -1;
 	}
 	
 	public void dropdownComponent(String[] args) {
@@ -496,22 +500,6 @@ public class Tb1PboMangaCafeView {
         });
 
     }
-	@SuppressWarnings("unchecked")
-	protected void readRuangCafe() {
-		try {
-			String fileName = "data_ruang_tersewa.txt";
-			FileInputStream fis = new FileInputStream(fileName);
-			ObjectInputStream ois = new ObjectInputStream(fis);
-			ruanganTersewa = (ArrayList<RuangCafe>) ois.readObject();
-			ois.close();
-		} catch (FileNotFoundException e) {
-//			JOptionPane.showMessageDialog(null, "File tidak bisa ditemukan.\nPesan kesalahan: " + e.getMessage());
-		} catch (ClassNotFoundException e) {
-//			JOptionPane.showMessageDialog(null, "Class tidak bisa ditemukan.\nPesan kesalahan: " + e.getMessage());
-		} catch (IOException e) {
-			JOptionPane.showMessageDialog(null, "Terjadi error pada saat merekam data ke storage.\n Pesan kesalahan: " + e.getMessage());
-		}
-	}
 	
 	private void resetForm() {
 		txtNamaPembooking.setText("");
