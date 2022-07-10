@@ -12,7 +12,7 @@ public class MySQLConnection {
   private static MySQLConnection instance = new MySQLConnection();
   public static final String URL = "jdbc:mysql://localhost:3306/manga_cafe";
   public static final String USER = "root";
-  public static final String PASSWORD = "password";
+  public static final String PASSWORD = "";
   public static final String DRIVER_CLASS = "com.mysql.cj.jdbc.Driver"; 
    
   //private constructor

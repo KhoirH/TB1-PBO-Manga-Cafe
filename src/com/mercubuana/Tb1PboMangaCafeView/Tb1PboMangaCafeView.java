@@ -1,6 +1,5 @@
 package com.mercubuana.Tb1PboMangaCafeView;
 
-import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
@@ -10,18 +9,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;	
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
@@ -298,14 +288,17 @@ public class Tb1PboMangaCafeView {
 	protected void getDataRuangan() {
 		tabbedPane.removeAll();
 		String[] columns = new String[] {
-            "No", "ID", "Ruang", "Jenis", "Sisa Ruang"
+            "No", "Ruang", "Jenis", "Sisa Ruang"
         };
 	      
-		DefaultListModel<String> demoList = new DefaultListModel<String>();	
+		DefaultListModel<String> demoList = new DefaultListModel<String>();
+		ruanganTersewa = new ArrayList<RuangCafe>();
 	     
-		ResultSet rsOrdering = MySQLConnection.SelectData("SELECT id_pembooking, jenis_ruangan, nama_ruangan.name as nama_ruangan, sisa_slot_sewa_harian, nama_pembooking, jumlah_slot_sewa_harian  from ruang_cafe INNER JOIN nama_ruangan on ruang_cafe.nama_ruangan = nama_ruangan.id ");
+		ResultSet rsOrdering = MySQLConnection.SelectData("SELECT id_pembooking, jenis_ruangan.name as jenis_ruangan, nama_ruangan.name as nama_ruangan, sisa_slot_sewa_harian, nama_pembooking, jumlah_slot_sewa_harian  from ruang_cafe INNER JOIN nama_ruangan on ruang_cafe.nama_ruangan = nama_ruangan.id INNER JOIN jenis_ruangan on ruang_cafe.jenis_ruangan = jenis_ruangan.id");
+		
 		// loop data booking place
 		try {
+			int i = 1;
 			while (rsOrdering.next()) {
 				int idPembooking = rsOrdering.getInt("id_pembooking");
 				
@@ -314,30 +307,32 @@ public class Tb1PboMangaCafeView {
 
 				String namaRuang = rsOrdering.getString("nama_ruangan");
 
-				int jenisRuang = rsOrdering.getInt("jenis_ruangan");
+				String jenisRuang = rsOrdering.getString("jenis_ruangan");
 				int sisaSlotSewaHarian = rsOrdering.getInt("sisa_slot_sewa_harian");
 				// list booking place
-				String listString = idPembooking + " - " + namaPembooking + " - " + namaRuang + "-" + jenisRuang + "(" + stringJumlahSlotSewaHarian + ")" ;
+				String listString = i + " - " + namaPembooking + " - " + namaRuang + "-" + jenisRuang + "(" + stringJumlahSlotSewaHarian + ")" ;
 				demoList.addElement(listString);
 				
-				RuangCafe ruangCafe = new RuangCafe(idPembooking, namaPembooking, namaRuang, "" + jenisRuang + "", stringJumlahSlotSewaHarian, sisaSlotSewaHarian);
+				RuangCafe ruangCafe = new RuangCafe(idPembooking, namaPembooking, namaRuang, jenisRuang , stringJumlahSlotSewaHarian, sisaSlotSewaHarian);
 				ruanganTersewa.add(ruangCafe);
+				i++;
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		ResultSet rsSum = MySQLConnection.SelectData("SELECT id_pembooking, jenis_ruangan, nama_ruangan.name as nama_ruangan, MIN(sisa_slot_sewa_harian) as sisa_slot_sewa_harian  from ruang_cafe INNER JOIN nama_ruangan on ruang_cafe.nama_ruangan = nama_ruangan.id GROUP by ruang_cafe.id_pembooking, ruang_cafe.nama_ruangan, ruang_cafe.jenis_ruangan");
+		ResultSet rsSum = MySQLConnection.SelectData("SELECT id_pembooking, jenis_ruangan.name as jenis_ruangan, nama_ruangan.name as nama_ruangan, MIN(sisa_slot_sewa_harian) as sisa_slot_sewa_harian  from ruang_cafe INNER JOIN nama_ruangan on ruang_cafe.nama_ruangan = nama_ruangan.id INNER JOIN jenis_ruangan on ruang_cafe.jenis_ruangan = jenis_ruangan.id  GROUP by ruang_cafe.nama_ruangan, ruang_cafe.jenis_ruangan");
 					
 		 //actual data for the table in a 2d array
 	      ArrayList<Object[]> dataTempTable = new ArrayList<Object[]>();
-	      int i = 0;
 	      try {
+
+		    int i = 1;
 			while (rsSum.next()) {
 				 
 				Object[] data = {
-						i, rsSum.getInt("id_pembooking"), rsSum.getString("nama_ruangan"), rsSum.getString("jenis_ruangan"), rsSum.getString("sisa_slot_sewa_harian")
+						i, rsSum.getString("nama_ruangan"), rsSum.getString("jenis_ruangan"), rsSum.getString("sisa_slot_sewa_harian")
 				};
 				
 				i++;
@@ -394,14 +389,23 @@ public class Tb1PboMangaCafeView {
 				jenisRuangan = "Reguler";
 		}
 		int jumlahSlot = Integer.parseInt(txtJumlahSlot.getText());
-		RuangCafe ruangCafe = new RuangCafe(activeId, namaPembooking, namaRuangan, jenisRuangan, jumlahSlot, 20);
-		if (activeRuanganIndex == -1) {
-			ruanganTersewa.add(ruangCafe);
-		} else {
-			ruanganTersewa.get(activeRuanganIndex).setNamaPembooking(namaPembooking);
-			ruanganTersewa.get(activeRuanganIndex).setNamaRuangan(namaRuangan);
-			ruanganTersewa.get(activeRuanganIndex).setJenisRuangan(jenisRuangan);
+		
+		ResultSet rsSisaSlot = MySQLConnection.SelectData("SELECT MIN(sisa_slot_sewa_harian) as sisa_slot_sewa_harian from ruang_cafe INNER JOIN nama_ruangan on ruang_cafe.nama_ruangan = nama_ruangan.id INNER JOIN jenis_ruangan on ruang_cafe.jenis_ruangan = jenis_ruangan.id where jenis_ruangan.name='"+ jenisRuangan +"' and nama_ruangan.name ='"+namaRuangan
+				+"' GROUP by ruang_cafe.nama_ruangan, ruang_cafe.jenis_ruangan");
+		int sisaSlot = 20;
+		try {
+			if(rsSisaSlot.next()) {
+				if(rsSisaSlot.getBoolean("sisa_slot_sewa_harian")) {
+					sisaSlot = rsSisaSlot.getInt("sisa_slot_sewa_harian");
+				}
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
+		RuangCafe ruangCafe = new RuangCafe(activeId, namaPembooking, namaRuangan, jenisRuangan, jumlahSlot, sisaSlot-jumlahSlot);
+		
 		recordRuangCafe(ruangCafe, activeRuanganIndex == -1 ? "Ruangan Berhasil Disimpan" : "Ruangan Berhasil Di Edit");
 		getDataRuangan();
 		resetForm();
@@ -409,8 +413,7 @@ public class Tb1PboMangaCafeView {
 	
 	private void deleteRuanganTersewa() {
 		int index = list.getSelectedIndex();
-		int rsOrdering = MySQLConnection.executeUpdate("DELETE FROM `ruang_cafe` WHERE id_pembooking=" + "'" + ruanganTersewa.get(index).getIdPembooking() + "'" + "");
-		ruanganTersewa.remove(index);
+		int rsOrdering = MySQLConnection.executeUpdate("DELETE FROM `ruang_cafe` WHERE id_pembooking=" + ruanganTersewa.get(index).getIdPembooking() + "");
 		getDataRuangan();
 	}
 	
@@ -421,6 +424,7 @@ public class Tb1PboMangaCafeView {
 		activeId = ruangan.getIdPembooking();
 		txtNamaPembooking.setText(ruangan.getNamaPembooking());
 		txtJumlahSlot.setText(Integer.toString(ruangan.getJumlahSlotSewaHarian()));
+		txtJumlahSlot.setEditable(false);
 		
 		switch (ruangan.getNamaRuangan()) {
 			case "R-01":
@@ -498,12 +502,12 @@ public class Tb1PboMangaCafeView {
                 jLabel.setText(selectedFruit);
             }
         });
-
     }
 	
 	private void resetForm() {
 		txtNamaPembooking.setText("");
 		txtJumlahSlot.setText("");;
+		txtJumlahSlot.setEnabled(true);
 		cmbRuangan.setSelectedIndex(0);
 		cmbTipeRuangan.setSelectedIndex(0);
 	}
